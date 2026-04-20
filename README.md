@@ -292,3 +292,76 @@ Cet atelier PRA PCA, **noté sur 20 points**, est évalué sur la base du barèm
 - Qualité du Readme (lisibilité, erreur, ...) (3 points)
 - Processus travail (quantité de commits, cohérence globale, interventions externes, ...) (4 points) 
 
+## Séquence 6 - Atelier 2 : Procédure de restauration (Runbook)
+
+### Objectif
+Choisir un point de restauration précis parmi les backups disponibles.
+
+### Étapes
+
+**1. Lister les backups disponibles**
+```bash
+kubectl -n pra run debug-backup --rm -it --image=alpine \
+  --overrides='{"spec":{"containers":[{"name":"debug","image":"alpine",
+  "command":["sh"],"stdin":true,"tty":true,"volumeMounts":[{"name":"backup",
+  "mountPath":"/backup"}]}],"volumes":[{"name":"backup",
+  "persistentVolumeClaim":{"claimName":"pra-backup"}}]}}'
+ls -lh /backup/
+exit
+```
+
+**2. Choisir le fichier de backup**
+Noter le nom du fichier souhaité, ex : `app-1776692821.db`
+
+**3. Modifier le Job de restauration**
+Editer la valeur `BACKUP_FILE` dans `pra/51-job-restore-custom.yaml` :
+```yaml
+value: "app-1776692821.db"
+```
+
+**4. Lancer la restauration**
+```bash
+kubectl delete job -n pra sqlite-restore-custom 2>/dev/null
+kubectl apply -f pra/51-job-restore-custom.yaml
+kubectl -n pra logs job/sqlite-restore-custom
+```
+
+**5. Vérifier**
+```bash
+curl -s http://localhost:8080/status | python3 -m json.tool
+```
+## Séquence 6 - Atelier 2 : Procédure de restauration (Runbook)
+
+### Objectif
+Choisir un point de restauration précis parmi les backups disponibles.
+
+### Étapes
+
+**1. Lister les backups disponibles**
+```bash
+kubectl -n pra run debug-backup --rm -it --image=alpine \
+  --overrides='{"spec":{"containers":[{"name":"debug","image":"alpine","command":["sh"],"stdin":true,"tty":true,"volumeMounts":[{"name":"backup","mountPath":"/backup"}]}],"volumes":[{"name":"backup","persistentVolumeClaim":{"claimName":"pra-backup"}}]}}'
+ls -lh /backup/
+exit
+```
+
+**2. Choisir le fichier de backup**
+Noter le nom du fichier souhaité, ex : `app-1776692821.db`
+
+**3. Modifier le Job de restauration**
+Editer la valeur `BACKUP_FILE` dans `pra/51-job-restore-custom.yaml` :
+```yaml
+value: "app-1776692821.db"
+```
+
+**4. Lancer la restauration**
+```bash
+kubectl delete job -n pra sqlite-restore-custom 2>/dev/null
+kubectl apply -f pra/51-job-restore-custom.yaml
+kubectl -n pra logs job/sqlite-restore-custom
+```
+
+**5. Vérifier**
+```bash
+curl -s http://localhost:8080/status | python3 -m json.tool
+```
