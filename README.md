@@ -150,7 +150,7 @@ Nous perdons donc ici notre application mais pas notre base de données puisque 
 
 Copier/coller le code suivant dans votre terminal Codespace pour détruire votre pod :
 ```
-kubectl -n pra get pods
+kubectl -n pra get pods 
 ```
 Notez le nom de votre pod qui est différent pour tout le monde.  
 Supprimez votre pod (pensez à remplacer <nom-du-pod-flask> par le nom de votre pod).  
@@ -231,27 +231,38 @@ Faites preuve de pédagogie et soyez clair dans vos explications et procedures d
 **Exercice 1 :**  
 Quels sont les composants dont la perte entraîne une perte de données ?  
   
-*..Répondez à cet exercice ici..*
+* Le PVC `pra-data` est le seul composant dont la perte entraîne une perte de données. C'est lui qui contient la base SQLite en production. Le pod lui-même ne contient aucune donnée persistante — sa destruction n'entraîne aucune perte. *
 
 **Exercice 2 :**  
 Expliquez nous pourquoi nous n'avons pas perdu les données lors de la supression du PVC pra-data  
   
-*..Répondez à cet exercice ici..*
+*..Grâce au CronJob de backup qui copie toutes les minutes la BDD du PVC pra-data vers le PVC pra-backup. Lors du sinistre, le dernier backup datait d'au maximum 1 minute. La restauration via le job sqlite-restore a recopié ce backup dans le nouveau PVC pra-data vide...*
 
 **Exercice 3 :**  
 Quels sont les RTO et RPO de cette solution ?  
   
-*..Répondez à cet exercice ici..*
+*..- RPO : ≈ 1 minute (fréquence du CronJob)
+- RTO : ≈ 2 à 5 minutes (recréation PVC + restauration manuelle)..*
 
 **Exercice 4 :**  
 Pourquoi cette solution (cet atelier) ne peux pas être utilisé dans un vrai environnement de production ? Que manque-t-il ?   
   
-*..Répondez à cet exercice ici..*
+*..- Stockage local non répliqué : les deux PVC sont sur le même disque du même node
+- Pas de haute disponibilité : un seul pod, un seul node
+- Pas de réplication géographique : aucun site secondaire
+- Restauration manuelle : intervention humaine requise
+- SQLite non adapté à la production multi-pods..*
   
 **Exercice 5 :**  
 Proposez une archtecture plus robuste.   
   
-*..Répondez à cet exercice ici..*
+*..- Remplacer SQLite par PostgreSQL avec réplication
+- Utiliser un stockage distribué (Longhorn, Ceph, AWS EBS)
+- Répliquer les backups vers S3/Azure Blob/GCS
+- Déployer sur plusieurs nodes (replicas ≥ 2)
+- Déployer en multi-zones géographiques
+- Automatiser la restauration avec Velero
+- Mettre en place un monitoring Prometheus + Grafana..*
 
 ---------------------------------------------------
 Séquence 6 : Ateliers  
