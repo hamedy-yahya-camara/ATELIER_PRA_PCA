@@ -92,3 +92,33 @@ def count():
 if __name__ == "__main__":
     init_db()
     app.run(host="0.0.0.0", port=8080)
+
+# ---------- Status ----------
+@app.get("/status")
+def status():
+    init_db()
+    # Count messages
+    conn = get_conn()
+    cur = conn.execute("SELECT COUNT(*) FROM events")
+    n = cur.fetchone()[0]
+    conn.close()
+
+    # Last backup info
+    backup_dir = "/backup"
+    last_backup_file = None
+    backup_age_seconds = None
+    try:
+        files = sorted(os.listdir(backup_dir))
+        if files:
+            last_backup_file = files[-1]
+            full_path = os.path.join(backup_dir, last_backup_file)
+            age = datetime.utcnow().timestamp() - os.path.getmtime(full_path)
+            backup_age_seconds = round(age)
+    except Exception:
+        pass
+
+    return jsonify(
+        count=n,
+        last_backup_file=last_backup_file,
+        backup_age_seconds=backup_age_seconds
+    )
