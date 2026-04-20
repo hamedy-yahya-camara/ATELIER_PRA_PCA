@@ -365,3 +365,6 @@ kubectl -n pra logs job/sqlite-restore-custom
 ```bash
 curl -s http://localhost:8080/status | python3 -m json.tool
 ```
+
+
+![alt text](image.png)
