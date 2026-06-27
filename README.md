@@ -1,3 +1,42 @@
+# 🛡️ Kubernetes Disaster Recovery Lab — PRA/PCA
+
+> Mise en œuvre d'un Plan de Reprise d'Activité (PRA) et d'un Plan de Continuité 
+> d'Activité (PCA) sur un cluster Kubernetes K3d, avec automatisation complète 
+> via Packer & Ansible.
+
+![Kubernetes](https://img.shields.io/badge/Kubernetes-K3d-326CE5?logo=kubernetes)
+![Ansible](https://img.shields.io/badge/Ansible-Automation-EE0000?logo=ansible)
+![Packer](https://img.shields.io/badge/Packer-ImageBuild-02A8EF?logo=packer)
+![Python](https://img.shields.io/badge/Python-Flask-3776AB?logo=python)
+
+## 🎯 Objectif du projet
+
+Ce projet démontre la mise en place d'une stratégie de sauvegarde et de restauration 
+sur Kubernetes :
+
+- **PCA** : haute disponibilité via la reconstruction automatique des pods
+- **PRA** : restauration des données depuis des backups automatiques (CronJob)
+- Mesure concrète des **RTO** (~2-5 min) et **RPO** (~1 min)
+
+## 🏗️ Stack technique
+
+| Outil | Rôle |
+|---|---|
+| K3d | Cluster Kubernetes local |
+| Packer | Build de l'image Docker Flask |
+| Ansible | Déploiement de l'infrastructure K8s |
+| Kubernetes CronJob | Sauvegardes automatiques toutes les minutes |
+| PVC | Stockage persistant des données et backups |
+
+## 📁 Structure du projet
+
+```
+├── ansible/        # Playbooks de déploiement
+├── app/            # Application Flask
+├── k8s/            # Manifestes Kubernetes
+├── pra/            # Jobs de restauration
+└── packer.pkr.hcl  # Build de l'image Docker
+```
 ------------------------------------------------------------------------------------------------------
 ATELIER PRA/PCA
 ------------------------------------------------------------------------------------------------------
